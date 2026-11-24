@@ -1,0 +1,84 @@
+{
+  "Main function": {
+    "prefix": ["main"],
+    "body": [
+      "void main(List<String> args) {",
+      "  $0",
+      "}"
+    ],
+    "description": "Top-level Dart main() entry point"
+  },
+  "Async main function": {
+    "prefix": ["amain"],
+    "body": [
+      "Future<void> main(List<String> args) async {",
+      "  $0",
+      "}"
+    ],
+    "description": "Top-level async Dart main() entry point"
+  },
+  "Test block": {
+    "prefix": ["test"],
+    "body": [
+      "test('${1:description}', () {",
+      "  $0",
+      "});"
+    ],
+    "description": "package:test test() block"
+  },
+  "Async test block": {
+    "prefix": ["atest"],
+    "body": [
+      "test('${1:description}', () async {",
+      "  $0",
+      "});"
+    ],
+    "description": "Async package:test test() block"
+  },
+  "Group block": {
+    "prefix": ["group"],
+    "body": [
+      "group('${1:description}', () {",
+      "  $0",
+      "});"
+    ],
+    "description": "package:test group() block"
+  },
+  "setUp block": {
+    "prefix": ["setup"],
+    "body": [
+      "setUp(() {",
+      "  $0",
+      "});"
+    ],
+    "description": "package:test setUp() hook"
+  },
+  "tearDown block": {
+    "prefix": ["teardown"],
+    "body": [
+      "tearDown(() {",
+      "  $0",
+      "});"
+    ],
+    "description": "package:test tearDown() hook"
+  },
+  "Switch expression": {
+    "prefix": ["switche"],
+    "body": [
+      "switch (${1:value}) {",
+      "  ${2:pattern} => ${3:result},",
+      "  _ => $0,",
+      "};"
+    ],
+    "description": "Dart 3 switch expression"
+  },
+  "Sealed class": {
+    "prefix": ["sealed"],
+    "body": [
+      "sealed class ${1:Name} {",
+      "  const ${1:Name}();",
+      "}$0"
+    ],
+    "description": "Dart 3 sealed class declaration"
+  }
+}

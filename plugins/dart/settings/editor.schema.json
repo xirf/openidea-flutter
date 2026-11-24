@@ -1,0 +1,46 @@
+{
+  "properties": {
+    "semanticHighlighting": {
+      "type": "boolean",
+      "title": "Dart semantic highlighting",
+      "description": "Provide Dart overlay semantic highlighting for doc-comment symbol links and pubspec.yaml alongside Dart LSP.",
+      "default": true,
+      "group": "Highlighting"
+    },
+    "highlightFunctionCalls": {
+      "type": "boolean",
+      "title": "Highlight Dart function & method calls",
+      "description": "Highlight function/method declarations and calls (including generic calls like readList<String>(...)) alongside Dart LSP tokens.",
+      "default": true,
+      "group": "Highlighting"
+    },
+    "formatOnSave": {
+      "type": "boolean",
+      "title": "Format Dart files on save",
+      "description": "Run `dart format` when saving a `.dart` file.",
+      "default": false,
+      "group": "Formatting"
+    },
+    "pubspecDiagnostics": {
+      "type": "boolean",
+      "title": "Validate pubspec.yaml",
+      "description": "Highlight duplicate dependencies, invalid package names, and missing local path dependencies while editing.",
+      "default": true,
+      "group": "Inspections"
+    },
+    "showCodeLenses": {
+      "type": "boolean",
+      "title": "Show Dart Code Lenses",
+      "description": "Display inline Pub Get / Upgrade / Outdated lenses in pubspec.yaml and Run/Test lenses in Dart files.",
+      "default": true,
+      "group": "Code Vision"
+    },
+    "showTestGutterActions": {
+      "type": "boolean",
+      "title": "Show main() and test() gutter run buttons",
+      "description": "Display runnable gutter icons next to `main()`, `test()`, and `group()` declarations.",
+      "default": true,
+      "group": "Code Vision"
+    }
+  }
+}

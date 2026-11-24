@@ -1,0 +1,37 @@
+{
+  "properties": {
+    "sdkPath": {
+      "type": "string",
+      "title": "Dart SDK path",
+      "description": "Optional path to a Dart SDK directory or `dart` executable. Leave empty to use FVM or PATH.",
+      "default": "",
+      "group": "SDK"
+    },
+    "useFvm": {
+      "type": "boolean",
+      "title": "Use FVM when .fvm exists",
+      "description": "Automatically invoke `fvm dart` when a `.fvm` directory is detected in the project root.",
+      "default": true,
+      "group": "SDK"
+    },
+    "pubOffline": {
+      "type": "boolean",
+      "title": "Pass --offline to pub commands",
+      "description": "Use cached packages without touching pub.dev when running pub get or pub upgrade.",
+      "default": false,
+      "group": "Pub"
+    },
+    "additionalAnalyzeArgs": {
+      "type": "string",
+      "title": "Additional dart analyze arguments",
+      "default": "",
+      "group": "Tooling"
+    },
+    "additionalTestArgs": {
+      "type": "string",
+      "title": "Additional dart test arguments",
+      "default": "",
+      "group": "Tooling"
+    }
+  }
+}

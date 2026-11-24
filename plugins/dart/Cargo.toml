@@ -1,0 +1,15 @@
+[package]
+name = "openidea-plugin-dart"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+openidea-plugin.workspace = true
+dart-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true

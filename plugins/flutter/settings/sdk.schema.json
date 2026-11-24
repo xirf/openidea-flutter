@@ -1,0 +1,38 @@
+{
+  "properties": {
+    "sdkPath": {
+      "type": "string",
+      "title": "Flutter SDK path",
+      "description": "Optional path to a Flutter SDK root or `flutter` executable. Leave empty to use FVM or PATH.",
+      "default": "",
+      "group": "SDK"
+    },
+    "useFvm": {
+      "type": "boolean",
+      "title": "Use FVM when .fvm exists",
+      "description": "Automatically invoke `fvm flutter` when a `.fvm` directory is present.",
+      "default": true,
+      "group": "SDK"
+    },
+    "defaultFlavor": {
+      "type": "string",
+      "title": "Default flavor",
+      "description": "Optional --flavor value passed to profile/release runs and builds.",
+      "default": "",
+      "group": "Run & Build"
+    },
+    "additionalRunArgs": {
+      "type": "string",
+      "title": "Additional flutter run/test arguments",
+      "default": "",
+      "group": "Run & Build"
+    },
+    "defaultBuildTarget": {
+      "type": "string",
+      "title": "Default build target",
+      "enum": ["apk", "appbundle", "ios", "ipa", "web", "macos", "linux", "windows"],
+      "default": "apk",
+      "group": "Run & Build"
+    }
+  }
+}

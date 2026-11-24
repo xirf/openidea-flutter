@@ -1,0 +1,264 @@
+id = "xirf.dart"
+name = "Dart"
+version = "0.1.0"
+description = "Dart IDE support ported from dart-intellij: Pub package management & outdated view, pubspec.yaml diagnostics/sorting/navigation, dart test --reporter=json tree & gutter runner, dart analyze/fix/format, semantic highlighting, live templates, and MCP tools."
+authors = ["xirf"]
+homepage = "https://github.com/xirf/openidea-flutter"
+license = "Apache-2.0"
+change-notes = "0.1.0 — initial port of Dart IntelliJ tooling for OpenIDEA: Pub actions, Pub Packages view, dart test JSON tree, semantic highlighting, pubspec intelligence, FVM/SDK settings, snippets, file templates, and MCP tools."
+categories = ["languages", "tools"]
+icon = "icons/dart.svg"
+icon-dark = "icons/dart_dark.svg"
+engines.openidea = "^1.12"
+wasm = "dist/plugin.wasm"
+activation = [
+    "on-language:dart",
+    "on-file:pubspec.yaml",
+    "on-command:*",
+    "on-view:pub-packages",
+    "on-event:file-saved",
+]
+
+[[extension-points]]
+id = "xirf.dart.tools"
+description = "Additional Dart/Pub tool actions registered by dependent plugins (such as xirf.flutter)."
+required = ["id", "title", "command"]
+fields = { id = "string", title = "string", command = "string", description = "string" }
+
+[capabilities]
+required = [
+    "project.read",
+    "editor.read",
+    "editor.write",
+    "events",
+    "process:dart",
+]
+optional = [
+    "project.write",
+    "process:fvm",
+]
+
+[[contributes.commands]]
+id = "pub-get"
+title = "Dart: Pub Get"
+category = "Dart"
+
+[[contributes.commands]]
+id = "pub-upgrade"
+title = "Dart: Pub Upgrade"
+category = "Dart"
+
+[[contributes.commands]]
+id = "pub-outdated"
+title = "Dart: Pub Outdated"
+category = "Dart"
+
+[[contributes.commands]]
+id = "pub-deps"
+title = "Dart: Pub Deps"
+category = "Dart"
+
+[[contributes.commands]]
+id = "pub-add"
+title = "Dart: Pub Add Dependency..."
+category = "Dart"
+
+[[contributes.commands]]
+id = "pub-remove"
+title = "Dart: Pub Remove Dependency..."
+category = "Dart"
+
+[[contributes.commands]]
+id = "dart-analyze"
+title = "Dart: Analyze Project"
+category = "Dart"
+
+[[contributes.commands]]
+id = "dart-format"
+title = "Dart: Format Current File"
+category = "Dart"
+
+[[contributes.commands]]
+id = "dart-fix"
+title = "Dart: Apply Dart Fix"
+category = "Dart"
+
+[[contributes.commands]]
+id = "dart-run"
+title = "Dart: Run File"
+category = "Dart"
+
+[[contributes.commands]]
+id = "dart-test"
+title = "Dart: Run Tests"
+category = "Dart"
+
+[[contributes.commands]]
+id = "run-target"
+title = "Dart: Run Target"
+category = "Dart"
+
+[[contributes.commands]]
+id = "open-pubspec"
+title = "Dart: Open pubspec.yaml"
+category = "Dart"
+
+[[contributes.commands]]
+id = "sort-pubspec"
+title = "Dart: Sort pubspec.yaml Dependencies"
+category = "Dart"
+
+[[contributes.commands]]
+id = "create-test-file"
+title = "Dart: Create Paired Test File"
+category = "Dart"
+
+[[contributes.menus]]
+menu = "tools"
+command = "pub-get"
+
+[[contributes.menus]]
+menu = "tools"
+command = "pub-upgrade"
+
+[[contributes.menus]]
+menu = "tools"
+command = "pub-outdated"
+
+[[contributes.menus]]
+menu = "tools"
+command = "dart-analyze"
+
+[[contributes.menus]]
+menu = "tools"
+command = "dart-fix"
+
+[[contributes.menus]]
+menu = "editor.context"
+command = "dart-format"
+when = "editorLang == dart"
+submenu = "Dart"
+
+[[contributes.menus]]
+menu = "editor.context"
+command = "dart-run"
+when = "editorLang == dart"
+submenu = "Dart"
+
+[[contributes.menus]]
+menu = "editor.context"
+command = "dart-test"
+when = "editorLang == dart"
+submenu = "Dart"
+
+[[contributes.menus]]
+menu = "editor.context"
+command = "create-test-file"
+when = "editorLang == dart"
+submenu = "Dart"
+
+[[contributes.menus]]
+menu = "projectView.context"
+command = "pub-get"
+submenu = "Dart"
+
+[[contributes.menus]]
+menu = "projectView.context"
+command = "dart-analyze"
+submenu = "Dart"
+
+[[contributes.keymaps]]
+command = "pub-get"
+key = "Ctrl+Alt+P"
+mac = "Meta+Alt+P"
+
+[[contributes.keymaps]]
+command = "dart-format"
+key = "Ctrl+Alt+L"
+mac = "Meta+Alt+L"
+
+[[contributes.statusBar]]
+id = "dart-status"
+text = "Dart"
+tooltip = "Run Dart Analyze on the current project"
+command = "dart-analyze"
+align = "right"
+priority = 200
+
+[contributes.settings]
+title = "Dart"
+
+[[contributes.settings.pages]]
+id = "sdk"
+title = "SDK & Tooling"
+schema = "settings/sdk.schema.json"
+actions = [
+    { title = "Run Dart Analyze", command = "dart-analyze" },
+    { title = "Run Pub Get", command = "pub-get" },
+]
+
+[[contributes.settings.pages]]
+id = "editor"
+title = "Editor & Highlighting"
+schema = "settings/editor.schema.json"
+
+[[contributes.views]]
+id = "pub-packages"
+title = "Pub Packages"
+icon = "icons/dart.svg"
+location = "bottom"
+
+[[contributes.providers]]
+kinds = [
+    "completion",
+    "code-actions",
+    "definition",
+    "line-markers",
+    "semantic-tokens",
+    "hover",
+    "diagnostics",
+    "document-links",
+    "code-lenses",
+    "folding",
+    "gutter-actions",
+]
+languages = ["dart", "yaml"]
+
+[[contributes.runConfigurations]]
+files = ["pubspec.yaml"]
+
+[[contributes.snippets]]
+language = "dart"
+path = "snippets/dart.json"
+
+[[contributes.fileTemplates]]
+id = "dart-file"
+name = "Dart File"
+extension = "dart"
+path = "templates/dart_file.dart"
+
+[[contributes.fileTemplates]]
+id = "dart-class"
+name = "Dart Class"
+extension = "dart"
+path = "templates/dart_class.dart"
+
+[[contributes.fileTemplates]]
+id = "dart-test"
+name = "Dart Test File"
+extension = "dart"
+path = "templates/dart_test.dart"
+
+[[contributes.mcpTools]]
+name = "dart_analyze"
+description = "Runs `dart analyze --format=machine` on the project and returns structured errors, warnings, and lints."
+inputSchema = "mcp/dart_analyze.schema.json"
+readOnly = true
+destructive = false
+
+[[contributes.mcpTools]]
+name = "pub_outdated"
+description = "Runs `dart pub outdated --json` on the project and lists upgradable/latest package versions."
+inputSchema = "mcp/pub_outdated.schema.json"
+readOnly = true
+destructive = false

@@ -1,0 +1,7 @@
+/target
+*.swp
+.DS_Store
+*.key
+*.oiplugin
+/release
+plugins/*/dist/*.wasm

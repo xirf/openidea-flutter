@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "verbose": {
+      "type": "boolean",
+      "description": "Pass -v to flutter doctor for full environment details."
+    }
+  },
+  "additionalProperties": false
+}

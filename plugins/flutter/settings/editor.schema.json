@@ -1,0 +1,43 @@
+{
+  "properties": {
+    "closingLabels": {
+      "type": "boolean",
+      "title": "Show Flutter closing labels",
+      "description": "Show `// Widget` inlay hints after multi-line widget constructors.",
+      "default": true,
+      "group": "UI Guides"
+    },
+    "closingLabelsMinLines": {
+      "type": "integer",
+      "title": "Minimum lines for closing labels",
+      "default": 2,
+      "group": "UI Guides"
+    },
+    "colorPreviews": {
+      "type": "boolean",
+      "title": "Flutter Color swatches",
+      "description": "Expose `Color(0x...)`, `Colors.*`, and `CupertinoColors.*` swatches and color presentations.",
+      "default": true,
+      "group": "Editor"
+    },
+    "iconPreviews": {
+      "type": "boolean",
+      "title": "Material & Cupertino icon hints",
+      "description": "Provide hover metadata, completion, and line markers for `Icons.*` and `CupertinoIcons.*`.",
+      "default": true,
+      "group": "Editor"
+    },
+    "semanticHighlighting": {
+      "type": "boolean",
+      "title": "Flutter widget & lifecycle semantic highlighting",
+      "default": true,
+      "group": "Editor"
+    },
+    "widgetCodeActions": {
+      "type": "boolean",
+      "title": "Widget wrap, unwrap, extract & State conversion actions",
+      "default": true,
+      "group": "Refactorings"
+    }
+  }
+}

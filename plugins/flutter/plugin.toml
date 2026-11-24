@@ -1,0 +1,333 @@
+id = "xirf.flutter"
+name = "Flutter"
+version = "0.1.0"
+description = "Flutter IDE support ported from flutter-intellij: closing labels, Material/Cupertino color & icon previews/completion/hover, Extract Widget & wrap/unwrap/Stateful conversions, flutter test --machine tree, build targets, emulator launcher, Flutter tools view, FVM/SDK settings, snippets, and MCP tools."
+authors = ["xirf"]
+homepage = "https://github.com/xirf/openidea-flutter"
+license = "Apache-2.0"
+change-notes = "0.1.0 — initial port of Flutter IntelliJ tooling for OpenIDEA: closing labels, widget refactorings, Material/Cupertino colors & icons, flutter test JSON runner, build targets, emulator launcher, Flutter tool window, snippets, file templates, and MCP tools."
+categories = ["frameworks", "tools"]
+icon = "icons/flutter.svg"
+icon-dark = "icons/flutter_dark.svg"
+engines.openidea = "^1.12"
+wasm = "dist/plugin.wasm"
+activation = [
+    "on-language:dart",
+    "on-file:pubspec.yaml",
+    "on-command:*",
+    "on-view:flutter-tools",
+    "on-event:file-saved",
+]
+
+[[depends]]
+id = "xirf.dart"
+version = "^0.1"
+
+[[contributes."xirf.dart.tools"]]
+id = "flutter-pub-get"
+title = "Flutter: Pub Get"
+command = "pub-get"
+description = "Fetch Flutter packages via flutter pub get"
+
+[[contributes."xirf.dart.tools"]]
+id = "flutter-doctor"
+title = "Flutter: Run Flutter Doctor"
+command = "doctor"
+description = "Inspect installed Flutter, Android, iOS, and desktop toolchains"
+
+[capabilities]
+required = [
+    "project.read",
+    "editor.read",
+    "editor.write",
+    "events",
+    "process:flutter",
+]
+optional = [
+    "process:fvm",
+]
+
+[[contributes.commands]]
+id = "pub-get"
+title = "Flutter: Pub Get"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "pub-upgrade"
+title = "Flutter: Pub Upgrade"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "pub-outdated"
+title = "Flutter: Pub Outdated"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "clean"
+title = "Flutter: Clean"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "doctor"
+title = "Flutter: Doctor"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "gen-l10n"
+title = "Flutter: Generate Localizations (gen-l10n)"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "upgrade"
+title = "Flutter: Upgrade SDK"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "build-apk"
+title = "Flutter: Build APK"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "build-appbundle"
+title = "Flutter: Build Android App Bundle"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "build-ios"
+title = "Flutter: Build iOS"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "build-ipa"
+title = "Flutter: Build IPA"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "build-web"
+title = "Flutter: Build Web"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "build-macos"
+title = "Flutter: Build macOS"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "build-linux"
+title = "Flutter: Build Linux"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "build-windows"
+title = "Flutter: Build Windows"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "build-pick"
+title = "Flutter: Build Target..."
+category = "Flutter"
+
+[[contributes.commands]]
+id = "run-profile"
+title = "Flutter: Run in Profile Mode"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "run-release"
+title = "Flutter: Run in Release Mode"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "attach"
+title = "Flutter: Attach Debugger"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "test"
+title = "Flutter: Run Tests"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "run-widget-test"
+title = "Flutter: Run Widget Test"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "widget-preview"
+title = "Flutter: Start Widget Preview"
+category = "Flutter"
+
+[[contributes.commands]]
+id = "launch-emulator"
+title = "Flutter: Launch Emulator..."
+category = "Flutter"
+
+[[contributes.commands]]
+id = "extract-widget"
+title = "Flutter: Extract Widget..."
+category = "Flutter"
+
+[[contributes.commands]]
+id = "open-devtools-browser"
+title = "Flutter: Open DevTools in Browser"
+category = "Flutter"
+
+[[contributes.menus]]
+menu = "tools"
+command = "doctor"
+
+[[contributes.menus]]
+menu = "tools"
+command = "clean"
+
+[[contributes.menus]]
+menu = "tools"
+command = "pub-get"
+
+[[contributes.menus]]
+menu = "tools"
+command = "build-pick"
+
+[[contributes.menus]]
+menu = "tools"
+command = "launch-emulator"
+
+[[contributes.menus]]
+menu = "editor.context"
+command = "extract-widget"
+when = "editorLang == dart"
+submenu = "Flutter"
+
+[[contributes.menus]]
+menu = "editor.context"
+command = "run-widget-test"
+when = "editorLang == dart"
+submenu = "Flutter"
+
+[[contributes.menus]]
+menu = "editor.context"
+command = "run-profile"
+when = "editorLang == dart"
+submenu = "Flutter"
+
+[[contributes.menus]]
+menu = "editor.context"
+command = "run-release"
+when = "editorLang == dart"
+submenu = "Flutter"
+
+[[contributes.menus]]
+menu = "projectView.context"
+command = "pub-get"
+submenu = "Flutter"
+
+[[contributes.menus]]
+menu = "projectView.context"
+command = "clean"
+submenu = "Flutter"
+
+[[contributes.menus]]
+menu = "projectView.context"
+command = "build-pick"
+submenu = "Flutter"
+
+[[contributes.keymaps]]
+command = "extract-widget"
+key = "Ctrl+Alt+W"
+mac = "Meta+Alt+W"
+
+[[contributes.keymaps]]
+command = "doctor"
+key = "Ctrl+Alt+D"
+mac = "Meta+Alt+D"
+
+[[contributes.statusBar]]
+id = "flutter-status"
+text = "Flutter"
+tooltip = "Run Flutter Doctor"
+command = "doctor"
+align = "right"
+priority = 210
+
+[contributes.settings]
+title = "Flutter"
+
+[[contributes.settings.pages]]
+id = "sdk"
+title = "SDK & Builds"
+schema = "settings/sdk.schema.json"
+actions = [
+    { title = "Run Flutter Doctor", command = "doctor" },
+    { title = "Flutter Pub Get", command = "pub-get" },
+]
+
+[[contributes.settings.pages]]
+id = "editor"
+title = "Editor & Widgets"
+schema = "settings/editor.schema.json"
+
+[[contributes.views]]
+id = "flutter-tools"
+title = "Flutter"
+icon = "icons/flutter.svg"
+location = "right"
+
+[[contributes.providers]]
+kinds = [
+    "completion",
+    "code-actions",
+    "definition",
+    "line-markers",
+    "semantic-tokens",
+    "inlay-hints",
+    "hover",
+    "diagnostics",
+    "document-links",
+    "code-lenses",
+    "colors",
+    "gutter-actions",
+]
+languages = ["dart", "yaml"]
+
+[[contributes.runConfigurations]]
+files = ["pubspec.yaml"]
+
+[[contributes.snippets]]
+language = "dart"
+path = "snippets/flutter.json"
+
+[[contributes.fileTemplates]]
+id = "stateless-widget"
+name = "Flutter StatelessWidget"
+extension = "dart"
+path = "templates/stateless_widget.dart"
+
+[[contributes.fileTemplates]]
+id = "stateful-widget"
+name = "Flutter StatefulWidget"
+extension = "dart"
+path = "templates/stateful_widget.dart"
+
+[[contributes.fileTemplates]]
+id = "widget-test"
+name = "Flutter Widget Test"
+extension = "dart"
+path = "templates/widget_test.dart"
+
+[[contributes.markerIcons]]
+id = "flutter-widget"
+icon = "icons/widget.svg"
+
+[[contributes.mcpTools]]
+name = "flutter_doctor"
+description = "Runs `flutter doctor` and returns structured toolchain status sections."
+inputSchema = "mcp/flutter_doctor.schema.json"
+readOnly = true
+destructive = false
+
+[[contributes.mcpTools]]
+name = "flutter_devices"
+description = "Runs `flutter devices --machine` and returns connected devices and emulators."
+inputSchema = "mcp/flutter_devices.schema.json"
+readOnly = true
+destructive = false
