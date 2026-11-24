@@ -1,11 +1,11 @@
 id = "xirf.flutter"
 name = "Flutter"
-version = "0.1.0"
+version = "0.1.1"
 description = "Flutter IDE support ported from flutter-intellij: closing labels, Material/Cupertino color & icon previews/completion/hover, Extract Widget & wrap/unwrap/Stateful conversions, flutter test --machine tree, build targets, emulator launcher, Flutter tools view, FVM/SDK settings, snippets, and MCP tools."
 authors = ["xirf"]
 homepage = "https://github.com/xirf/openidea-flutter"
 license = "Apache-2.0"
-change-notes = "0.1.0 — initial port of Flutter IntelliJ tooling for OpenIDEA: closing labels, widget refactorings, Material/Cupertino colors & icons, flutter test JSON runner, build targets, emulator launcher, Flutter tool window, snippets, file templates, and MCP tools."
+change-notes = "0.1.1 — Extract Flutter Widget now captures free local variables, enclosing parameters, and class fields into constructor arguments and final fields, and declines unsafe extractions (this/widget/setState/mutations/unknown identifiers) without modifying the document."
 categories = ["frameworks", "tools"]
 icon = "icons/flutter.svg"
 icon-dark = "icons/flutter_dark.svg"

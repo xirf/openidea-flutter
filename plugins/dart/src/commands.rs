@@ -38,8 +38,17 @@ pub fn run_tool_captured(
     program: &str,
     args: &[String],
 ) -> Result<ProcessOutput, Error> {
+    run_tool_with_stdin(project, program, args, None)
+}
+
+pub fn run_tool_with_stdin(
+    project: &Project,
+    program: &str,
+    args: &[String],
+    stdin: Option<&str>,
+) -> Result<ProcessOutput, Error> {
     let cmd = host::Command::new(program).args(args.iter().map(String::as_str));
-    host::run_command(&cmd, Some(project), None)
+    host::run_command(&cmd, Some(project), stdin)
 }
 
 pub fn active_project(ctx: &Invocation) -> Result<Project, Error> {
@@ -244,9 +253,19 @@ pub fn run_dart_format(ctx: &Invocation) -> Result<Option<String>, Error> {
         .ok_or_else(|| Error::Failed("Focus a Dart editor to format.".into()))?;
     let path = editor.path();
     let doc = editor.document()?;
+    if doc.text.is_empty() {
+        return Ok(None);
+    }
     let (prog, mut args) = resolve_dart_tool(&project);
-    args.extend(["format".into(), "--output=show".into(), path.clone()]);
-    let out = run_tool_captured(&project, &prog, &args)?;
+    args.extend([
+        "format".into(),
+        "--output=show".into(),
+        "--summary=none".into(),
+        "--show=none".into(),
+        "--stdin-name".into(),
+        path,
+    ]);
+    let out = run_tool_with_stdin(&project, &prog, &args, Some(&doc.text))?;
     if out.status != Some(0) {
         return Err(Error::Failed(format!("dart format failed: {}", out.stderr.trim())));
     }

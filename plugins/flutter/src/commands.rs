@@ -3,7 +3,9 @@ use dart_core::TextPos;
 use dart_core::cli::{
     parse_devices_json, parse_doctor_output, parse_emulators_output, resolve_program,
 };
-use dart_core::flutter_widgets::{extract_flutter_widget, widget_at_cursor};
+use dart_core::flutter_widgets::{
+    ExtractError, can_extract_flutter_widget, extract_flutter_widget, widget_at_cursor,
+};
 use openidea_plugin::host;
 use openidea_plugin::{
     Error, Invocation, NotificationLevel, PickItem, Position, ProcessOutput, Project, Range,
@@ -247,10 +249,13 @@ pub fn extract_widget_command(ctx: &Invocation) -> Result<Option<String>, Error>
     let cursor = sels.first().map(|r| r.start).unwrap_or_default();
     let span = widget_at_cursor(&doc.text, TextPos::new(cursor.line, cursor.character))
         .ok_or_else(|| Error::Failed("Place the cursor inside a Flutter widget constructor.".into()))?;
+    if let Err(err) = can_extract_flutter_widget(&doc.text, &span) {
+        return Err(extract_error_to_plugin(err));
+    }
     let name = host::input("New StatelessWidget name", Some("ExtractedWidget"))?
         .ok_or(Error::Cancelled)?;
     let (call, class_def) = extract_flutter_widget(&doc.text, &span, &name)
-        .ok_or_else(|| Error::Invalid("Widget name must be a valid PascalCase identifier.".into()))?;
+        .map_err(extract_error_to_plugin)?;
 
     let lines: Vec<&str> = doc.text.split('\n').collect();
     let last_line = lines.len().saturating_sub(1);
@@ -274,6 +279,17 @@ pub fn extract_widget_command(ctx: &Invocation) -> Result<Option<String>, Error>
         ],
     )?;
     Ok(None)
+}
+
+fn extract_error_to_plugin(err: ExtractError) -> Error {
+    match err {
+        ExtractError::InvalidName => {
+            Error::Invalid("Widget name must be a valid PascalCase identifier.".into())
+        }
+        ExtractError::Unsafe(reason) => {
+            Error::Failed(format!("Cannot safely extract widget: {reason}"))
+        }
+    }
 }
 
 pub fn open_devtools_browser(ctx: &Invocation) -> Result<Option<String>, Error> {

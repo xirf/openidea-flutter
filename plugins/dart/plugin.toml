@@ -1,11 +1,11 @@
 id = "xirf.dart"
 name = "Dart"
-version = "0.1.0"
+version = "0.1.1"
 description = "Dart IDE support ported from dart-intellij: Pub package management & outdated view, pubspec.yaml diagnostics/sorting/navigation, dart test --reporter=json tree & gutter runner, dart analyze/fix/format, semantic highlighting, live templates, and MCP tools."
 authors = ["xirf"]
 homepage = "https://github.com/xirf/openidea-flutter"
 license = "Apache-2.0"
-change-notes = "0.1.0 — initial port of Dart IntelliJ tooling for OpenIDEA: Pub actions, Pub Packages view, dart test JSON tree, semantic highlighting, pubspec intelligence, FVM/SDK settings, snippets, file templates, and MCP tools."
+change-notes = "0.1.1 — dart format now formats the live editor buffer via stdin (`--stdin-name`) instead of reading disk contents, preserving unsaved edits and document-version checks."
 categories = ["languages", "tools"]
 icon = "icons/dart.svg"
 icon-dark = "icons/dart_dark.svg"

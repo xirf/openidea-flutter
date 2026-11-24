@@ -279,4 +279,74 @@ class CounterCard extends StatelessWidget {
         let mut plugin = FlutterPlugin::default();
         assert!(plugin.call("unknown", "{}", &host.invocation()).is_err());
     }
+
+    #[test]
+    fn extract_widget_command_captures_local_variables_and_declines_unsafe() {
+        // 1. Regression check: free local `message` must be captured via field + constructor arg (non-const call).
+        let src = "\
+import 'package:flutter/material.dart';
+
+class Home extends StatelessWidget {
+  const Home({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final message = 'hello';
+    return Text(message);
+  }
+}
+";
+        let host = MockHost::install().with_capabilities(&[
+            "project.read",
+            "editor.read",
+            "editor.write",
+        ]);
+        host.set_project_root(Some("/app"));
+        host.open_editor("/app/lib/home.dart", "dart", src, &[(8, 12, 8, 12)]);
+        host.answer_next_prompt(Some(&["Greeting"]));
+
+        let mut plugin = FlutterPlugin::default();
+        plugin
+            .run_command("extract-widget", &host.invocation(), None)
+            .unwrap();
+        let updated = host.editor_text();
+        assert!(updated.contains("return Greeting(message: message);"));
+        assert!(!updated.contains("return const Greeting("));
+        assert!(updated.contains("class Greeting extends StatelessWidget"));
+        assert!(updated.contains("const Greeting({super.key, required this.message});"));
+        assert!(updated.contains("final String message;"));
+
+        // 2. Unsafe extraction declines without modifying the editor and hides the code action.
+        let unsafe_src = "\
+import 'package:flutter/material.dart';
+
+class Home extends StatelessWidget {
+  const Home({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final message = compute();
+    return Text(message);
+  }
+}
+";
+        host.open_editor("/app/lib/home.dart", "dart", unsafe_src, &[(8, 12, 8, 12)]);
+        assert!(
+            plugin
+                .run_command("extract-widget", &host.invocation(), None)
+                .is_err()
+        );
+        assert_eq!(host.editor_text(), unsafe_src);
+
+        let actions = plugin.code_actions(
+            &Document {
+                path: "/app/lib/home.dart".into(),
+                language: "dart".into(),
+                version: 1,
+                text: unsafe_src.into(),
+            },
+            Range::new(Position::new(8, 12), Position::new(8, 12)),
+        );
+        assert!(!actions.iter().any(|a| a.title.starts_with("Extract Flutter Widget")));
+    }
 }

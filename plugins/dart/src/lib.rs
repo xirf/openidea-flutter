@@ -74,7 +74,9 @@ impl Plugin for DartPlugin {
             if let Event::FileSaved(path) = ev {
                 if path.ends_with("pubspec.yaml") {
                     host::refresh_view(views::PUB_PACKAGES_VIEW);
-                } else if path.ends_with(".dart") && highlighting::setting_bool("formatOnSave", false)
+                } else if path.ends_with(".dart")
+                    && highlighting::setting_bool("formatOnSave", false)
+                    && ctx.editor().is_some_and(|e| e.path() == *path)
                 {
                     let _ = commands::run_dart_format(ctx);
                 }
@@ -238,5 +240,112 @@ AppSourceAGIChat appSourceAGIChatFromMap(Map<String, dynamic> json) {
         let mut plugin = DartPlugin::default();
         assert!(plugin.call("unknown_tool", "{}", &host.invocation()).is_err());
         let _ = Position::default();
+    }
+
+    #[test]
+    fn dart_format_formats_live_dirty_buffer_via_stdin_not_disk() {
+        let host = MockHost::install().with_capabilities(&[
+            "project.read",
+            "editor.read",
+            "editor.write",
+            "process:dart",
+        ]);
+        host.set_project_root(Some("/proj"));
+        host.add_file("lib/main.dart", "void main() {\n  print('saved');\n}\n");
+        host.open_editor(
+            "/proj/lib/main.dart",
+            "dart",
+            "void main(){print('UNSAVED-USER-EDIT');}\n",
+            &[(0, 0, 0, 0)],
+        );
+        host.on_process("dart", |args, stdin| {
+            assert!(args.contains(&"format".to_owned()));
+            assert!(args.contains(&"--output=show".to_owned()));
+            assert!(args.contains(&"--summary=none".to_owned()));
+            assert!(args.contains(&"--show=none".to_owned()));
+            let stdin_name_pos = args.iter().position(|a| a == "--stdin-name").unwrap();
+            assert_eq!(args.get(stdin_name_pos + 1).map(String::as_str), Some("/proj/lib/main.dart"));
+            assert_eq!(args.last().map(String::as_str), Some("/proj/lib/main.dart"));
+            assert_eq!(args.iter().filter(|a| *a == "/proj/lib/main.dart").count(), 1);
+            let source = stdin.expect("dart format must receive live editor buffer via stdin");
+            assert!(source.contains("UNSAVED-USER-EDIT"));
+            Ok(openidea_plugin::ProcessOutput {
+                status: Some(0),
+                stdout: "void main() {\n  print('UNSAVED-USER-EDIT');\n}\n".into(),
+                stderr: String::new(),
+            })
+        });
+
+        let mut plugin = DartPlugin::default();
+        let res = plugin.run_command("dart-format", &host.invocation(), None).unwrap();
+        assert_eq!(res, None);
+        assert_eq!(host.editor_text(), "void main() {\n  print('UNSAVED-USER-EDIT');\n}\n");
+        assert!(!host.editor_text().contains("saved"));
+    }
+
+    #[test]
+    fn dart_format_respects_document_version_and_capabilities() {
+        // 1. Missing editor.write capability preserves dirty buffer.
+        let host = MockHost::install().with_capabilities(&["project.read", "editor.read", "process:dart"]);
+        host.set_project_root(Some("/proj"));
+        host.add_file("lib/main.dart", "void main() {\n  print('saved');\n}\n");
+        host.open_editor("/proj/lib/main.dart", "dart", "void main(){print('dirty');}\n", &[(0, 0, 0, 0)]);
+        host.on_process("dart", |_, stdin| {
+            assert_eq!(stdin, Some("void main(){print('dirty');}\n"));
+            Ok(openidea_plugin::ProcessOutput {
+                status: Some(0),
+                stdout: "void main() {\n  print('dirty');\n}\n".into(),
+                stderr: String::new(),
+            })
+        });
+        let mut plugin = DartPlugin::default();
+        assert!(plugin.run_command("dart-format", &host.invocation(), None).is_err());
+        assert_eq!(host.editor_text(), "void main(){print('dirty');}\n");
+
+        // 2. Typing advances document version; formatting formats latest buffer and bumps version.
+        let host = MockHost::install().with_capabilities(&[
+            "project.read",
+            "editor.read",
+            "editor.write",
+            "process:dart",
+        ]);
+        host.set_project_root(Some("/proj"));
+        host.open_editor("/proj/lib/main.dart", "dart", "void main(){", &[(0, 0, 0, 0)]);
+        host.type_in_editor("print('v2');}\n");
+        assert_eq!(host.editor_version(), 2);
+        host.on_process("dart", |_, stdin| {
+            assert_eq!(stdin, Some("void main(){print('v2');}\n"));
+            Ok(openidea_plugin::ProcessOutput {
+                status: Some(0),
+                stdout: "void main() {\n  print('v2');\n}\n".into(),
+                stderr: String::new(),
+            })
+        });
+        plugin.run_command("dart-format", &host.invocation(), None).unwrap();
+        assert_eq!(host.editor_text(), "void main() {\n  print('v2');\n}\n");
+        assert_eq!(host.editor_version(), 3);
+
+        // Unchanged output is a no-op that does not bump version.
+        host.on_process("dart", |_, stdin| {
+            Ok(openidea_plugin::ProcessOutput {
+                status: Some(0),
+                stdout: stdin.unwrap().to_owned(),
+                stderr: String::new(),
+            })
+        });
+        plugin.run_command("dart-format", &host.invocation(), None).unwrap();
+        assert_eq!(host.editor_version(), 3);
+
+        // 3. Formatter error exit preserves dirty buffer.
+        host.open_editor("/proj/lib/main.dart", "dart", "void main( {\n", &[(0, 0, 0, 0)]);
+        host.on_process("dart", |_, _| {
+            Ok(openidea_plugin::ProcessOutput {
+                status: Some(65),
+                stdout: String::new(),
+                stderr: "Could not format".into(),
+            })
+        });
+        assert!(plugin.run_command("dart-format", &host.invocation(), None).is_err());
+        assert_eq!(host.editor_text(), "void main( {\n");
     }
 }

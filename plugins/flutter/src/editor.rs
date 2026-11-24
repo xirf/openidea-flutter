@@ -6,8 +6,9 @@ use dart_core::flutter_catalog::{
     format_color_presentations,
 };
 use dart_core::flutter_widgets::{
-    WrapKind, closing_labels, convert_stateful_to_stateless, convert_stateless_to_stateful,
-    extract_flutter_widget, remove_widget_wrapper, widget_at_cursor, wrap_with_widget,
+    ExtractError, WrapKind, can_extract_flutter_widget, closing_labels,
+    convert_stateful_to_stateless, convert_stateless_to_stateful, extract_flutter_widget,
+    remove_widget_wrapper, widget_at_cursor, wrap_with_widget,
 };
 use dart_core::pubspec::Pubspec;
 use openidea_plugin::diagnostics::DiagnosticsProvider;
@@ -320,14 +321,16 @@ impl Providers for crate::FlutterPlugin {
         let pos = TextPos::new(selection.start.line, selection.start.character);
 
         if let Some(span) = widget_at_cursor(&doc.text, pos) {
-            // Deferred Extract Widget (uses host::input in resolve_code_action)
-            actions.push(CodeAction {
-                title: format!("Extract Flutter Widget ({})...", span.name),
-                kind: Some("refactor".into()),
-                preferred: false,
-                edits: Vec::new(),
-                data: Some(format!("extract:{}:{}", selection.start.line, selection.start.character)),
-            });
+            if can_extract_flutter_widget(&doc.text, &span).is_ok() {
+                // Deferred Extract Widget (uses host::input in resolve_code_action)
+                actions.push(CodeAction {
+                    title: format!("Extract Flutter Widget ({})...", span.name),
+                    kind: Some("refactor".into()),
+                    preferred: false,
+                    edits: Vec::new(),
+                    data: Some(format!("extract:{}:{}", selection.start.line, selection.start.character)),
+                });
+            }
 
             if let Some(unwrapped) = remove_widget_wrapper(&doc.text, &span) {
                 actions.push(CodeAction {
@@ -406,8 +409,12 @@ impl Providers for crate::FlutterPlugin {
         {
             let name = host::input("New StatelessWidget name", Some("ExtractedWidget"))?
                 .ok_or(Error::Cancelled)?;
-            let (call, class_def) = extract_flutter_widget(&doc.text, &span, &name)
-                .ok_or_else(|| Error::Invalid("Widget name must be PascalCase".into()))?;
+            let (call, class_def) = extract_flutter_widget(&doc.text, &span, &name).map_err(|e| match e {
+                ExtractError::InvalidName => Error::Invalid("Widget name must be PascalCase".into()),
+                ExtractError::Unsafe(reason) => {
+                    Error::Failed(format!("Cannot safely extract widget: {reason}"))
+                }
+            })?;
             let lines: Vec<&str> = doc.text.split('\n').collect();
             let last_line = lines.len().saturating_sub(1);
             let last_col =
