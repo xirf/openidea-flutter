@@ -433,6 +433,7 @@ fn find_top_level_named_arg<'a>(args: &'a str, name: &str) -> Option<&'a str> {
         if depth_paren == 0
             && depth_brace == 0
             && depth_bracket == 0
+            && args.is_char_boundary(i)
             && let Some(rest) = args[i..].strip_prefix(name)
             && (i == 0 || !is_ident_char(bytes[i - 1]))
             && rest.trim_start().starts_with(':')
@@ -2529,6 +2530,7 @@ fn find_top_level_keyword(s: &str, kw: &str) -> Option<usize> {
         if dp == 0
             && db == 0
             && dk == 0
+            && s.is_char_boundary(i)
             && s[i..].starts_with(kw)
             && (i == 0 || !is_ident_char(bytes[i - 1]))
             && bytes.get(i + kw.len()).is_none_or(|c| !is_ident_char(*c))
@@ -2752,7 +2754,7 @@ fn contains_word(haystack: &str, word: &str) -> bool {
         if left_ok && right_ok {
             return true;
         }
-        start = pos + 1;
+        start = pos + haystack[pos..].chars().next().map_or(1, char::len_utf8);
     }
     false
 }

@@ -42,7 +42,11 @@ pub fn find_flutter_colors(text: &str) -> Vec<FlutterColorMatch> {
     let mut i = 0usize;
     let mut matches = Vec::new();
 
-    while i < len {
+    'outer: while i < len {
+        if !text.is_char_boundary(i) {
+            i += 1;
+            continue;
+        }
         if bytes[i] == b'/' && bytes.get(i + 1) == Some(&b'/') {
             while i < len && bytes[i] != b'\n' {
                 i += 1;
@@ -152,7 +156,7 @@ pub fn find_flutter_colors(text: &str) -> Vec<FlutterColorMatch> {
                         argb,
                     });
                     i = full_end;
-                    continue;
+                    continue 'outer;
                 }
             }
         }
@@ -231,7 +235,11 @@ pub fn find_flutter_icons(text: &str) -> Vec<FlutterIconMatch> {
     let len = bytes.len();
     let mut i = 0usize;
     let mut out = Vec::new();
-    while i < len {
+    'outer: while i < len {
+        if !text.is_char_boundary(i) {
+            i += 1;
+            continue;
+        }
         for (family, prefix) in [("Material", "Icons."), ("Cupertino", "CupertinoIcons.")] {
             if text[i..].starts_with(prefix) && is_boundary(bytes, i) {
                 let mut end = i + prefix.len();
@@ -249,7 +257,7 @@ pub fn find_flutter_icons(text: &str) -> Vec<FlutterIconMatch> {
                         entry,
                     });
                     i = end;
-                    continue;
+                    continue 'outer;
                 }
             }
         }
@@ -504,5 +512,26 @@ final f = CupertinoColors.activeBlue;
         assert_eq!(icons.len(), 2);
         assert_eq!(icons[0].entry.unwrap().codepoint, 0xe297);
         assert_eq!(icons[1].entry.unwrap().family, "Cupertino");
+    }
+
+    #[test]
+    fn handles_multibyte_utf8_in_colors_and_icons() {
+        let src = r#"
+// Header — em-dash, café, rocket 🚀
+const label = 'Status — ready';
+final c1 = Color(0xFF1E88E5);//—comment
+final c2 = Colors.blue;//—after
+const i1 = Icon(Icons.add);//—after
+const i2 = Icon(CupertinoIcons.heart);//é
+"#;
+        let colors = find_flutter_colors(src);
+        assert_eq!(colors.len(), 2);
+        assert_eq!(colors[0].argb, 0xFF1E88E5);
+        assert_eq!(colors[1].label, "Colors.blue");
+
+        let icons = find_flutter_icons(src);
+        assert_eq!(icons.len(), 2);
+        assert_eq!(icons[0].full_name, "Icons.add");
+        assert_eq!(icons[1].full_name, "CupertinoIcons.heart");
     }
 }
